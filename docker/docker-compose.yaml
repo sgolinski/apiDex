@@ -11,7 +11,7 @@ services:
     volumes:
       - ../:/var/www/html
     extra_hosts:
-      - "alerts.local:127.0.0.1"
+      - "alerts.local:192.168.178.31"
     hostname: alerts.local
     domainname: local
     restart: always
@@ -32,7 +32,7 @@ services:
       MYSQL_DB_NAME: alerts
       MYSQL_USER: alerts
       MYSQL_PASSWORD: alerts
-      SITE_URL: http://localhost
+      SITE_URL: http://192.168.178.31/
     volumes:
       - ./scripts/init.sql:/docker-entrypoint-initdb.d/1.sql
     restart: always

@@ -1,0 +1,21 @@
+{
+  "name": "szymon/alertqueue",
+  "autoload": {
+    "psr-4": {
+      "Src\\": "src/"
+    }
+  },
+  "authors": [
+    {
+      "name": "sgolinski",
+      "email": "simon.golinski@gmail.com"
+    }
+  ],
+  "require": {
+    "ext-mysqli": "*",
+    "vlucas/phpdotenv": "^5.3",
+    "ext-pdo": "*",
+    "alek13/slack": "^2.2",
+    "ext-sqlite3": "*"
+  }
+}

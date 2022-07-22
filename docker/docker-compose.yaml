@@ -1,7 +1,7 @@
 version: "3.7"
 
 services:
-  php-apache:
+  php-apache_pi:
     build:
       dockerfile: docker/Dockerfile
       context: ./..
@@ -16,11 +16,11 @@ services:
     domainname: local
     restart: always
     links:
-      - db-mysql
+      - db-mysql_pi
     depends_on:
-      - db-mysql
+      - db-mysql_pi
 
-  db-mysql:
+  db-mysql_pi:
     image: mysql:5.6
     platform: linux/amd64
     ports:

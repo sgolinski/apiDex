@@ -1,7 +1,7 @@
 version: "3.7"
 
 services:
-  php-apache_pi:
+  php-apache:
     build:
       dockerfile: docker/Dockerfile
       context: ./..
@@ -11,7 +11,7 @@ services:
     volumes:
       - ../:/var/www/html
     extra_hosts:
-      - "alerts.local:192.168.178.31"
+      - "alerts.local:127.0.0.1"
     hostname: alerts.local
     domainname: local
     restart: always
@@ -31,7 +31,7 @@ services:
       MYSQL_DB_NAME: alerts
       MYSQL_USER: alerts
       MYSQL_PASSWORD: alerts
-      SITE_URL: http://192.168.178.31/
+      SITE_URL: http://localhost
     volumes:
       - ./scripts/init.sql:/docker-entrypoint-initdb.d/1.sql
     restart: always

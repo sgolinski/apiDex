@@ -1,9 +1,10 @@
 <?php
 
-namespace Src;
+namespace Src\Controllers;
 
 use Maknz\Slack\Client as SlackClient;
 use Maknz\Slack\Message;
+use Src\Database\Database;
 use Src\Entity\Maker;
 use Src\Entity\Taker;
 use Src\ValueObjects\Address;
@@ -12,10 +13,10 @@ use Src\ValueObjects\Name;
 use Src\ValueObjects\Price;
 use Src\ValueObjects\Token;
 
-class TokenControllerWIthSqlLite
+class TokenController
 {
-    private $db;
-    private $slack;
+    private Database $db;
+    private SlackClient $slack;
 
     private const HOOK = 'https://hooks.slack.com/services/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';
 
@@ -25,14 +26,13 @@ class TokenControllerWIthSqlLite
         $this->db = $db;
     }
 
-
     /**
      * Process flow :
      * Request comming  to  getAllPostsByIdentifier
      * Adding new record to messageQueue
      *
      */
-    public function getAllPostsByIdentifier(string $string)
+    public function getAllMakersFromRequest(string $string): void
     {
 
         $arr = json_decode($string);
@@ -42,9 +42,10 @@ class TokenControllerWIthSqlLite
             $address = Address::fromString($stdClass->address->address);
             $dropValuer = Price::fromFloat($stdClass->taker->dropValue->price);
             $token = Token::fromString($stdClass->taker->token->token);
+            $holders = Holders::fromInt((int)$stdClass->holders->holders);
             $created = (int)$stdClass->created;
+            $this->createRecordIntoMessageQueue(new Maker($name, $address, new Taker($token, $dropValuer), $created, $holders));
 
-            $this->createRecordIntoMessageQueue(new Maker($name, $address, new Taker($token, $dropValuer), $created));
         }
     }
 
@@ -54,7 +55,7 @@ class TokenControllerWIthSqlLite
      * Adding new record to messageQueue
      *
      */
-    public function getMakersFromQueue()
+    public function getMakersFromQueue(): array
     {
         $currentTime = time();
         $query = "
@@ -64,11 +65,12 @@ class TokenControllerWIthSqlLite
           message_queue WHERE processed = :processed AND created < :created ;
     ";
         try {
-//            $statement = $this->db->query($query);
-            $statement = $this->db->prepare($query);
-            $statement->bindValue('processed', 0, SQLITE3_INTEGER);
-            $statement->bindValue('created', 0, SQLITE3_INTEGER);
 
+            $statement = $this->db->prepare($query);
+            $statement->execute([
+                'processed' => 0,
+                'created' => (int)$currentTime
+            ]);
             $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
         } catch (\PDOException $e) {
             exit($e->getMessage());
@@ -77,28 +79,21 @@ class TokenControllerWIthSqlLite
         return $result;
     }
 
-    public function sendAlert(mixed $alert)
+    public function sendAlertAndUpdate($value): void
     {
         $message = new Message();
-        $message->setText($alert);
+        $message->setText($value['alert']);
         $this->slack->sendMessage($message);
-
+        usleep(200000);
+        $this->updateMessageQueue($value['name']);
+        usleep(300000);
     }
 
-    private function getMaker($name)
-    {
-        $result = $this->findInQueue($name);
-        if (!$result) {
-            return $this->notFoundResponse();
-        }
-        $response['status_code_header'] = 'HTTP/1.1 200 OK';
-        $response['body'] = json_encode($result);
-        return $response;
-    }
-
-    public function createRecordIntoMessageQueue(Maker $maker)
+    public function createRecordIntoMessageQueue(Maker $maker): bool
     {
         if ($this->validateMaker($maker->getName()->asString())) {
+            $currentTime = time();
+            $this->updateCreatedInQueue($maker->getName()->asString(), $currentTime);
             return false;
         }
 
@@ -111,22 +106,16 @@ class TokenControllerWIthSqlLite
 
         try {
             $statement = $this->db->prepare($query);
-            $statement->bindValue('name', $maker->getName()->asString(), SQLITE3_TEXT);
-            $statement->bindValue('address', $maker->getAddress()->asString(), SQLITE3_TEXT);
-            $statement->bindValue('holders', $maker->getHolders()->asInt(), SQLITE3_INTEGER);
-            $statement->bindValue('token', $maker->getTaker()->getToken()->asString(), SQLITE3_INTEGER);
-            $statement->bindValue('dropValue', $maker->getTaker()->getDropValue()->asFloat(), SQLITE3_FLOAT);
-            $statement->bindValue('created', $maker->getCreated(), SQLITE3_INTEGER);
-
-
-//                    "name" => $maker->getName()->asString(),
-//                    "address" => $maker->getAddress()->asString(),
-//                    "holders" => 0,
-//                    "token" => $maker->getTaker()->getToken()->asString(),
-//                    "dropValue" => $maker->getTaker()->getDropValue()->asFloat(),
-//                    "created" => $maker->getCreated(),
-//                    "alert" => $maker->alert(),
-
+            $statement->execute(
+                [
+                    "name" => $maker->getName()->asString(),
+                    "address" => $maker->getAddress()->asString(),
+                    "holders" => $maker->getHolders()->asInt(),
+                    "token" => $maker->getTaker()->getToken()->asString(),
+                    "dropValue" => $maker->getTaker()->getDropValue()->asFloat(),
+                    "created" => $maker->getCreated(),
+                    "alert" => $maker->alert(),
+                ]);
             $statement->rowCount();
         } catch (\PDOException $e) {
             exit($e->getMessage());
@@ -135,7 +124,7 @@ class TokenControllerWIthSqlLite
         return true;
     }
 
-    public function updateMessageQueue(string $name)
+    public function updateMessageQueue(string $name): ?array
     {
 
         $statement = "
@@ -160,7 +149,7 @@ class TokenControllerWIthSqlLite
         return $response;
     }
 
-    private function findInQueue($name)
+    private function findInQueue($name): bool
     {
         $query = "
       SELECT
@@ -172,7 +161,9 @@ class TokenControllerWIthSqlLite
 
         try {
             $statement = $this->db->prepare($query);
-            $statement->bindValue('name', $name, SQLITE3_TEXT);
+            $statement->execute([
+                'name' => $name
+            ]);
             $result = $statement->rowCount();
 
         } catch (\PDOException $e) {
@@ -186,14 +177,13 @@ class TokenControllerWIthSqlLite
         return $this->findInQueue($name);
     }
 
-
-    public function deleteOutdatedMarkers()
+    public function deleteOutdatedMarkers(): void
     {
         $currentTime = time();
 
         $query = "
       DELETE FROM message_queue
-      WHERE :created - created > 3600 AND processed = :processed;
+      WHERE :created - created > 7200 AND processed = :processed;
     ";
 
         try {
@@ -209,5 +199,31 @@ class TokenControllerWIthSqlLite
             exit($e->getMessage());
         }
 
+    }
+
+    private function updateCreatedInQueue(string $name, int $currentTime): ?array
+    {
+
+        $statement = "
+      UPDATE message_queue
+      SET
+        created = :created
+      WHERE name = :name;
+    ";
+
+        try {
+            $statement = $this->db->prepare($statement);
+            $statement->execute(array(
+                'created' => $currentTime,
+                'name' => $name,
+            ));
+            $statement->rowCount();
+        } catch (\PDOException $e) {
+            exit($e->getMessage());
+        }
+        $response['status_code_header'] = 'HTTP/1.1 200 OK';
+        $response['body'] = json_encode(array('message' => 'Post Updated!'));
+
+        return $response;
     }
 }

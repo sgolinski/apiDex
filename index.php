@@ -1,8 +1,7 @@
 <?php
 
+use Src\Controllers\TokenController;
 use Src\SQLiteConnection;
-use Src\TokenController;
-use Src\TokenControllerWIthSqlLite;
 
 require "start.php";
 

@@ -2,7 +2,6 @@
 
 namespace Src\Entity;
 
-
 use InvalidArgumentException;
 use Src\ValueObjects\Name;
 use Src\ValueObjects\Price;
@@ -54,17 +53,11 @@ class Taker
         }
     }
 
-    /**
-     * @return Token
-     */
     public function getToken(): Token
     {
         return $this->token;
     }
 
-    /**
-     * @return Price
-     */
     public function getDropValue(): Price
     {
         return $this->dropValue;
@@ -74,6 +67,5 @@ class Taker
     {
         $this->dropValue = $dropValue;
     }
-
 
 }

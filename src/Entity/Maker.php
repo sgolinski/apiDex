@@ -38,7 +38,7 @@ class Maker
     ): void
     {
         if (in_array($name, NAME::BLACKLISTED_NAMES)) {
-            throw new InvalidArgumentException('TokenController is on the blacklist');
+            throw new InvalidArgumentException('Token is on the blacklist');
         }
     }
 
@@ -62,17 +62,11 @@ class Maker
             "Holders: " . $this->getHolders()->asInt() . PHP_EOL;
     }
 
-    /**
-     * @return Address
-     */
     public function getAddress(): Address
     {
         return $this->address;
     }
 
-    /**
-     * @return Name
-     */
     public function getName(): Name
     {
         return $this->name;
@@ -83,25 +77,16 @@ class Maker
         $this->holders = $holders;
     }
 
-    /**
-     * @return Holders
-     */
     public function getHolders(): Holders
     {
         return $this->holders;
     }
 
-    /**
-     * @return Taker
-     */
     public function getTaker(): Taker
     {
         return $this->taker;
     }
 
-    /**
-     * @return string
-     */
     public function getExternalListingByIndex(
         string $index
     ): string
@@ -109,9 +94,6 @@ class Maker
         return $this->externalListingLinks[$index];
     }
 
-    /**
-     * @return int
-     */
     public function getCreated(): int
     {
         return $this->created;
@@ -127,13 +109,8 @@ class Maker
         return serialize($this->getExternalListingLinks());
     }
 
-    /**
-     * @return array
-     */
     public function getExternalListingLinks(): array
     {
         return $this->externalListingLinks;
     }
-
-
 }

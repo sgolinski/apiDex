@@ -1,11 +1,11 @@
 <?php return array(
     'root' => array(
-        'pretty_version' => '1.0.0+no-version-set',
-        'version' => '1.0.0.0',
+        'pretty_version' => 'dev-main',
+        'version' => 'dev-main',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => NULL,
+        'reference' => 'b11f39613071a06d9d5587ced543d30523092b7b',
         'name' => 'szymon/alertqueue',
         'dev' => true,
     ),
@@ -155,12 +155,12 @@
             'dev_requirement' => false,
         ),
         'szymon/alertqueue' => array(
-            'pretty_version' => '1.0.0+no-version-set',
-            'version' => '1.0.0.0',
+            'pretty_version' => 'dev-main',
+            'version' => 'dev-main',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => NULL,
+            'reference' => 'b11f39613071a06d9d5587ced543d30523092b7b',
             'dev_requirement' => false,
         ),
         'vlucas/phpdotenv' => array(

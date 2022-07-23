@@ -1,9 +1,9 @@
 <?php
 require 'start.php';
 
-use Src\Controllers\TokenController;
 use Src\Entity\Maker;
 use Src\Entity\Taker;
+use Src\TokenController;
 use Src\ValueObjects\Address;
 use Src\ValueObjects\Holders;
 use Src\ValueObjects\Name;

@@ -1,10 +1,9 @@
 <?php
 
 use Src\Controllers\TokenController;
-use Src\Database\Database;
-use Src\SQLiteConnection;
 
-require_once __DIR__ . '/vendor/autoload.php';
+
+require "start.php";
 
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
@@ -21,13 +20,7 @@ $requestQueue = new SplQueue();
 //// everything else results in a 404 Not Found
 ///
 
-$db = new SQLiteConnection();
 
-try {
-    $db->connect();
-} catch (Exception $exception) {
-    echo $exception->getMessage();
-}
 if ($uri[2] !== 'data') {
 
     exit();
@@ -39,8 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = file_get_contents('php://input');
     $requestQueue->enqueue($data);
 }
-
-$controller = new TokenController(Database::connect());
+$controller = new TokenController($dbConnection);
 
 if (!$requestQueue->isEmpty()) {
 

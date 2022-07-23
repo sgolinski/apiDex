@@ -1,9 +1,10 @@
 <?php
 
 use Src\Controllers\TokenController;
+use Src\Database\Database;
 use Src\SQLiteConnection;
 
-require "start.php";
+require_once __DIR__ . '/vendor/autoload.php';
 
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
@@ -38,7 +39,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = file_get_contents('php://input');
     $requestQueue->enqueue($data);
 }
-$controller = new TokenController($dbConnection);
+
+$controller = new TokenController(Database::connect());
 
 if (!$requestQueue->isEmpty()) {
 

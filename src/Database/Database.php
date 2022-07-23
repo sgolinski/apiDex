@@ -1,17 +1,20 @@
 <?php
+
 namespace Src\Database;
 
-class Database {
+class Database
+{
 
-    private $dbConnection = null;
+    private static $dbConnection = null;
 
-    public function __construct()
+    private function __construct()
     {
-        $host = $_ENV['DB_HOST'];
-        $port = $_ENV['DB_PORT'];
-        $db   = $_ENV['DB_DATABASE'];
-        $user = $_ENV['DB_USERNAME'];
-        $pass = $_ENV['DB_PASSWORD'];
+
+        $host = 'db-mysql';
+        $port = '3306';
+        $db = 'alerts';
+        $user = 'root';
+        $pass = 'alerts';
 
         try {
             $this->dbConnection = new \PDO(
@@ -24,8 +27,8 @@ class Database {
         }
     }
 
-    public function connect()
+    public static function connect()
     {
-        return $this->dbConnection;
+        return new self;
     }
 }

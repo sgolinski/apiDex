@@ -13,7 +13,7 @@ RUN docker-php-ext-install mysqli pdo pdo_mysql && docker-php-ext-enable mysqli
 ADD /src /var/www/html
 ADD /index.php index.php
 ADD /start.php start.php
-ADD /.env .env
+
 
 
 RUN echo 'SetEnv MYSQL_DB_CONNECTION ${MYSQL_DB_CONNECTION}' >> /etc/apache2/conf-enabled/environment.conf

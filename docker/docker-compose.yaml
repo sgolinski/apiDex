@@ -21,7 +21,7 @@ services:
     restart: always
     links:
       - db-mysql
-      - redis
+      - alert_redis
     networks:
       - alert-queue
     depends_on:

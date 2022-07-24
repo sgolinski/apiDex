@@ -43,7 +43,9 @@ if (!$requestQueue->isEmpty()) {
     var_dump(Redis::get_redis()->dbsize());
 }
 $keysOutdated = $controller->findKeysToDelete();
-RedisWriter::removeOutdated($keysOutdated);
+if (!empty($keysOutdated)) {
+    RedisWriter::removeOutdated($keysOutdated);
+};
 $response['status_code_header'] = 'HTTP/1.1 200 OK';
 $response['body'] = json_encode(array('message' => 'Job done!'));
 

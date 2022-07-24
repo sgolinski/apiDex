@@ -16,4 +16,9 @@ class RedisReader
         }
         return null;
     }
+
+    public static function findKey($name)
+    {
+        return Redis::get_redis()->exists($name->asString());
+    }
 }

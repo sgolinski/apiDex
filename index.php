@@ -3,9 +3,8 @@
 use Src\Controllers\RedisTokenController;
 use Src\Factory;
 use Src\Writer\RedisWriter;
-use Src\Datastore\Redis;
 
-require "start.php";
+require 'vendor/autoload.php';
 
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
@@ -16,6 +15,7 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $uri = explode('/', $uri);
 
+var_dump(\Src\Datastore\Redis::get_redis()->dbsize());
 $requestQueue = new SplQueue();
 
 if ($uri[2] !== 'data') {
@@ -38,15 +38,13 @@ if (!$requestQueue->isEmpty()) {
     $result = $controller->getAllMakersFromRequest($request);
 
     if ($result) {
+
         Factory::createAlertService()->sendSlackAlerts($result);
+
+        RedisWriter::writeToRedis($result);
     }
-    var_dump(Redis::get_redis()->dbsize());
 }
-$keysOutdated = $controller->findKeysToDelete();
-if (!empty($keysOutdated)) {
-    RedisWriter::removeOutdated($keysOutdated);
-};
 $response['status_code_header'] = 'HTTP/1.1 200 OK';
 $response['body'] = json_encode(array('message' => 'Job done!'));
-
+\Src\Datastore\Redis::get_redis()->save();
 return $response;

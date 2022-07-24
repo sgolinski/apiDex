@@ -17,6 +17,6 @@
     "ext-pdo": "*",
     "alek13/slack": "^2.2",
     "ext-sqlite3": "*",
-    "predis/predis": "^2.0",
+    "predis/predis": "^2.0"
   }
 }

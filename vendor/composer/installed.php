@@ -5,7 +5,7 @@
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => '4f51835e8975b8b32c771d5b856fcede3399cbff',
+        'reference' => '225f6964c563efb83112061175cb4114743a2995',
         'name' => 'szymon/alertqueue',
         'dev' => true,
     ),
@@ -169,7 +169,7 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => '4f51835e8975b8b32c771d5b856fcede3399cbff',
+            'reference' => '225f6964c563efb83112061175cb4114743a2995',
             'dev_requirement' => false,
         ),
         'vlucas/phpdotenv' => array(

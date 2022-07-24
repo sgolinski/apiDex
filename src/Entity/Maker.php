@@ -2,7 +2,6 @@
 
 namespace Src\Entity;
 
-use InvalidArgumentException;
 use Src\ValueObjects\Address;
 use Src\ValueObjects\Holders;
 use Src\ValueObjects\Name;
@@ -24,7 +23,6 @@ class Maker
         Holders $holders,
     )
     {
-        $this->ensureTokenNameIsNotBlacklisted($name->asString());
         $this->name = $name;
         $this->address = $address;
         $this->taker = $taker;
@@ -33,14 +31,6 @@ class Maker
         $this->setLinkToListings();
     }
 
-    private function ensureTokenNameIsNotBlacklisted(
-        string $name
-    ): void
-    {
-        if (in_array($name, NAME::BLACKLISTED_NAMES)) {
-            throw new InvalidArgumentException('Token is on the blacklist');
-        }
-    }
 
     public function setLinkToListings(): void
     {

@@ -5,7 +5,7 @@
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => 'f713ac1e4094233ac56071199777f9193b5687fc',
+        'reference' => '4f51835e8975b8b32c771d5b856fcede3399cbff',
         'name' => 'szymon/alertqueue',
         'dev' => true,
     ),
@@ -62,6 +62,15 @@
             'install_path' => __DIR__ . '/../phpoption/phpoption',
             'aliases' => array(),
             'reference' => 'eab7a0df01fe2344d172bff4cd6dbd3f8b84ad15',
+            'dev_requirement' => false,
+        ),
+        'predis/predis' => array(
+            'pretty_version' => 'v2.0.0',
+            'version' => '2.0.0.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../predis/predis',
+            'aliases' => array(),
+            'reference' => '99c253733dee9447d26257dc669d33d5ac84713d',
             'dev_requirement' => false,
         ),
         'psr/http-client' => array(
@@ -160,7 +169,7 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => 'f713ac1e4094233ac56071199777f9193b5687fc',
+            'reference' => '4f51835e8975b8b32c771d5b856fcede3399cbff',
             'dev_requirement' => false,
         ),
         'vlucas/phpdotenv' => array(

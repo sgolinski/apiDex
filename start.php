@@ -2,7 +2,7 @@
 
 require 'vendor/autoload.php';
 
-use Src\Database;
+use Src\Datastore\Database;
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->safeLoad();

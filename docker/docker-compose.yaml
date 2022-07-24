@@ -1,5 +1,9 @@
 version: "3.7"
 
+networks:
+  alert-queue:
+    driver: "bridge"
+
 services:
   php-apache:
     build:
@@ -17,6 +21,9 @@ services:
     restart: always
     links:
       - db-mysql
+      - redis
+    networks:
+      - alert-queue
     depends_on:
       - db-mysql
 
@@ -25,6 +32,8 @@ services:
     ports:
       - "3306:3306"
     working_dir: /application
+    networks:
+      - alert-queue
     environment:
       MYSQL_ROOT_PASSWORD: alerts
       MYSQL_DB_CONNECTION: alerts
@@ -36,17 +45,12 @@ services:
       - ./scripts/init.sql:/docker-entrypoint-initdb.d/1.sql
     restart: always
 
-#  db-sqlite:
-#    container_name: sqlite3_container
-#    image: nouchka/sqlite3:latest
-#    stdin_open: true
-#    tty: true
-#    volumes:
-#      #Modify following line
-#      - ./data/sqlite3:/root/db/
-#    ports:
-#      - '9000:9000' # expose ports - HOST:CONTAINER
-#    restart: unless-stopped
-#
+  redis:
+    image: redis:4.0
+    container_name: alert_redis
+    ports:
+      - "6382:6379"
+    networks:
+      - alert-queue
 
 

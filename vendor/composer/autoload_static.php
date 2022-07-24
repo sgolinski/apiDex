@@ -28,6 +28,7 @@ class ComposerStaticInit798395ffda49bb70684ace373a9b37fa
         array (
             'Psr\\Http\\Message\\' => 17,
             'Psr\\Http\\Client\\' => 16,
+            'Predis\\' => 7,
             'PhpOption\\' => 10,
         ),
         'M' => 
@@ -72,6 +73,10 @@ class ComposerStaticInit798395ffda49bb70684ace373a9b37fa
         'Psr\\Http\\Client\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/http-client/src',
+        ),
+        'Predis\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/predis/predis/src',
         ),
         'PhpOption\\' => 
         array (

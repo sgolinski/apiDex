@@ -1,7 +1,9 @@
 <?php
 
-use Src\Controllers\TokenController;
-
+use Src\Controllers\RedisTokenController;
+use Src\Factory;
+use Src\Writer\RedisWriter;
+use Src\Datastore\Redis;
 
 require "start.php";
 
@@ -11,15 +13,10 @@ header("Access-Control-Allow-Methods: OPTIONS,GET,POST,PUT,DELETE");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $uri = explode('/', $uri);
 
 $requestQueue = new SplQueue();
-// endpoints starting with `/post` or `/posts` for GET shows all posts
-//// everything else results in a 404 Not Found
-///
-
 
 if ($uri[2] !== 'data') {
 
@@ -32,18 +29,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = file_get_contents('php://input');
     $requestQueue->enqueue($data);
 }
-$controller = new TokenController($dbConnection);
+
+$controller = new RedisTokenController();
 
 if (!$requestQueue->isEmpty()) {
 
-    $proccesRequest = $requestQueue->dequeue();
-    $controller->getAllMakersFromRequest($proccesRequest);
-    $result = $controller->getMakersFromQueue();
-    foreach ($result as $value) {
-        $controller->sendAlertAndUpdate($value);
+    $request = $requestQueue->dequeue();
+    $result = $controller->getAllMakersFromRequest($request);
+
+    if ($result) {
+        Factory::createAlertService()->sendSlackAlerts($result);
     }
+    var_dump(Redis::get_redis()->dbsize());
 }
-$controller->deleteOutdatedMarkers();
+$keysOutdated = $controller->findKeysToDelete();
+RedisWriter::removeOutdated($keysOutdated);
 $response['status_code_header'] = 'HTTP/1.1 200 OK';
 $response['body'] = json_encode(array('message' => 'Job done!'));
 

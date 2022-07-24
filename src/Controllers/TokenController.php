@@ -4,9 +4,9 @@ namespace Src\Controllers;
 
 use Maknz\Slack\Client as SlackClient;
 use Maknz\Slack\Message;
-use Src\Database\Database;
 use Src\Entity\Maker;
 use Src\Entity\Taker;
+use Src\Factory;
 use Src\ValueObjects\Address;
 use Src\ValueObjects\Holders;
 use Src\ValueObjects\Name;
@@ -15,14 +15,15 @@ use Src\ValueObjects\Token;
 
 class TokenController
 {
-    private Database $db;
+    private $db;
+
     private SlackClient $slack;
 
     private const HOOK = 'https://hooks.slack.com/services/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';
 
     public function __construct($db)
     {
-        $this->slack = new SlackClient(self::HOOK);
+
         $this->db = $db;
     }
 
@@ -32,9 +33,8 @@ class TokenController
      * Adding new record to messageQueue
      *
      */
-    public function getAllMakersFromRequest(string $string): void
+    public function getAllMakersFromRequest($string)
     {
-
         $arr = json_decode($string);
 
         foreach ($arr as $stdClass) {
@@ -45,8 +45,9 @@ class TokenController
             $holders = Holders::fromInt((int)$stdClass->holders->holders);
             $created = (int)$stdClass->created;
             $this->createRecordIntoMessageQueue(new Maker($name, $address, new Taker($token, $dropValuer), $created, $holders));
-
         }
+
+
     }
 
     /**
@@ -81,12 +82,9 @@ class TokenController
 
     public function sendAlertAndUpdate($value): void
     {
-        $message = new Message();
-        $message->setText($value['alert']);
-        $this->slack->sendMessage($message);
-        usleep(200000);
+        Factory::createAlertService()->sendMessageWhenIsBsc($value);
         $this->updateMessageQueue($value['name']);
-        usleep(300000);
+
     }
 
     public function createRecordIntoMessageQueue(Maker $maker): bool

@@ -3,6 +3,7 @@
 use Src\Controllers\RedisTokenController;
 use Src\Factory;
 use Src\Writer\RedisWriter;
+use \Src\Datastore\Redis;
 
 require 'vendor/autoload.php';
 
@@ -15,7 +16,6 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $uri = explode('/', $uri);
 
-var_dump(\Src\Datastore\Redis::get_redis()->dbsize());
 $requestQueue = new SplQueue();
 
 if ($uri[2] !== 'data') {
@@ -46,5 +46,10 @@ if (!$requestQueue->isEmpty()) {
 }
 $response['status_code_header'] = 'HTTP/1.1 200 OK';
 $response['body'] = json_encode(array('message' => 'Job done!'));
-\Src\Datastore\Redis::get_redis()->save();
+Redis::get_redis()->save();
+
+if (Redis::get_redis()->dbsize() > 1000) {
+    Redis::get_redis()->flushall();
+}
+
 return $response;
